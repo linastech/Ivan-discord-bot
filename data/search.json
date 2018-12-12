@@ -1,0 +1,25 @@
+{
+  "availableServices": [
+    "google",
+    "imgur",
+    "bing"
+  ],
+  "nextCall": "bing",
+  "statistics": {
+    "google": {
+      "callsMadeToday": 0,
+      "dailyQuota": 99,
+      "limitExceeded": false
+    },
+    "imgur": {
+      "callsMadeToday": 0,
+      "dailyQuota": 12000,
+      "limitExceeded": false
+    },
+    "bing": {
+      "callsMadeToday": 0,
+      "dailyQuota": 94,
+      "limitExceeded": false
+    }
+  }
+}
