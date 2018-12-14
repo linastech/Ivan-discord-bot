@@ -4,7 +4,7 @@
     "imgur",
     "bing"
   ],
-  "nextCall": "bing",
+  "nextCall": "imgur",
   "statistics": {
     "google": {
       "callsMadeToday": 0,

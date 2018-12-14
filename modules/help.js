@@ -1,24 +1,8 @@
-const Discord   = require('discord.js');
-const Commands  = require('../commands.js');
-const helper    = require('../helper.js');
-const DB        = require('../database/index.js');
 const CFG       = require('config').get('app');
 
-class Info extends Commands{
-  constructor(client){
-    super(client);
-
-    this.registerCommand({
-      aliases:    'help',
-      callback:   this.help.bind(this),
-    });
-
-    helper.log("Loaded plugin: info");
-  }
-
-  help(msg){
-
-    msg.channel.send({
+module.exports = class help{
+  execute(message, params){
+    message.channel.send({
       embed: {
         description: `
 Privyet comrade, I'm slav discord bot capable of doing just about anything you want. \n
@@ -92,5 +76,3 @@ ivan should i go to bed?`,
     });
   }
 }
-
-module.exports = Info;

@@ -1,15 +1,17 @@
 {
   "name": "ivan-discord-bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Ivan, russian themed discord bot",
   "scripts": {
-    "dev": "export NODE_ENV=developement || set NODE_ENV=developement&& nodemon index.js",
-    "production": "export NODE_ENV=production || set NODE_ENV=production&& node index.js"
+    "dev": "export NODE_ENV=developement || set NODE_ENV=developement&& nodemon --inspect ./",
+    "production": "export NODE_ENV=production || set NODE_ENV=production&& node ./"
   },
   "author": "Linas Rakauskas",
   "license": "MIT",
   "nodemonConfig": {
-    "ignore": ["data/*.json"]
+    "ignore": [
+      "data/*.json"
+    ]
   },
   "dependencies": {
     "axios": "^0.18.0",

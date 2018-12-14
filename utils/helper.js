@@ -2,7 +2,7 @@ const util    = require('util');
 const moment  = require('moment');
 const chalk   = require('chalk');
 
-const helper = {
+module.exports = {
   log: (...args) => {
     console.log(
       chalk.blue(`[${moment().format( 'YYYY-MM-DD hh:mm:ss' )}]`), 
@@ -32,5 +32,3 @@ const helper = {
     return Math.round((Math.random() * to) + from);
   }
 }
-
-module.exports = helper

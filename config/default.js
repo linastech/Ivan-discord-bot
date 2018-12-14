@@ -6,7 +6,6 @@ module.exports = {
     prefix:     ">",
     alias:      "ivan",
     name:       "ivan",
-    pluginDir:  "./plugins",
     infoColor:  560805,
     webURL:     "https://theivan.wtf",
     webName:    "theivan.wtf",
@@ -25,12 +24,6 @@ module.exports = {
       ID:       "",
       secret:   "",
     }
-  },
-  fun: {
-    cooldown: 3000,
-  },
-  leaderboard: {
-    cooldown:   3000
   },
   database:         {
     host:     "127.0.0.1", 

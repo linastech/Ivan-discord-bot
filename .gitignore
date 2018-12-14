@@ -65,3 +65,4 @@ key.pub
 package-lock.json
 test.mp3
 .vscode/sftp.json
+.vscode/launch.json

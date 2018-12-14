@@ -3,13 +3,10 @@ const Fetch     = require('node-fetch');
 const CFGapp    = require('config').get('app');
 const CFG       = require('config').get('search');
 const jsonfile  = require('jsonfile');
-const Commands  = require('../commands.js');
-const helper    = require('../helper.js');
+const helper    = require('../utils/helper');
 
-class Search extends Commands{
-  constructor(client){
-    super(client);
-
+module.exports = class imageSearch{
+  constructor(){
     this.dataFile = `${CFGapp.root}/data/search.json`;
     this.dataFileObj = null;
 
@@ -19,26 +16,21 @@ class Search extends Commands{
         helper.logError(client, err);
       else
         this.dataFileObj = obj;
-    })
-
-    client.on('message', msg => this.messageSent(msg));
-
-    helper.log("Loaded plugin: Search");
+    });
   }
+  
+  isImageSearch(message){
+    const input = message.content.toLowerCase();
 
-  messageSent(msg){
-    if(msg.author.bot)
-      return;
-    
-    const input = msg.content.toLowerCase();
-
-    if(!input.startsWith(`${CFGapp.name} show me`))
-      return;
+    //must start with the bot name
+    if(!input.startsWith(`${CFGapp.name} show me`)) return false;
     
     const query = input.replace(`${CFGapp.name} show me`, "");
 
-    this[this.dataFileObj.nextCall](msg, query);
+    this[this.dataFileObj.nextCall](message, query)
     this.balanceApiCalls();
+
+    return true;
   }
 
   balanceApiCalls(){
@@ -89,7 +81,6 @@ class Search extends Commands{
     .catch(error => console.log(error));
   }
 
-  //TODO avoid hitting 12,500 requests limit, switch to different API
   imgur(msg, query){
     Axios({
       url: `https://api.imgur.com/3/gallery/search/viral/top/`,
@@ -144,7 +135,6 @@ class Search extends Commands{
   }
 
   google(msg, query){
-
     Axios({
       url: 'https://www.googleapis.com/customsearch/v1/siterestrict/',
       method: 'get',
@@ -179,5 +169,3 @@ class Search extends Commands{
     })
   }
 }
-
-module.exports = Search;

@@ -1,41 +1,7 @@
-const Commands  = require('../commands.js');
-const helper    = require('../helper.js');
-const DB        = require('../database/index.js');
-
-class Music extends Commands{
-  constructor(client){
-    super(client);
+module.exports = class music{
+  constructor(){
     this.audioBots = {};
-
-    
-    this.registerCommand({
-      aliases:    'join',
-      callback:   this.join.bind(this),
-    });
-
-    this.registerCommand({
-      aliases:    'play',
-      callback:   this.play.bind(this),
-    });
-
-    this.registerCommand({
-      aliases:    'leave',
-      callback:   this.leave.bind(this),
-    });
-
-    this.registerCommand({
-      aliases:    'pause',
-      callback:   this.pause.bind(this),
-    });
-
-    this.registerCommand({
-      aliases:    'resume',
-      callback:   this.resume.bind(this),
-    });
-
-    helper.log("Loaded plugin: Music");
   }
-
   leave(msg){
     const guildID = msg.guild.id;
 
@@ -44,7 +10,6 @@ class Music extends Commands{
     }else{
       this.audioBots[guildID].conn.channel.leave();
     }
-      
   }
 
   pause(msg){
@@ -123,7 +88,4 @@ class Music extends Commands{
   startPlayer(session){
 
   }
-
 }
-
-module.exports = Music;
