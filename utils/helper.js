@@ -1,19 +1,9 @@
-const util    = require('util');
 const moment  = require('moment');
 const chalk   = require('chalk');
 
 module.exports = {
-  log: (...args) => {
-    console.log(
-      chalk.blue(`[${moment().format( 'YYYY-MM-DD hh:mm:ss' )}]`), 
-      args.join(' - ')
-    )
-  },
-  logEvent: (client, type) => {
-    helper.log(client.user.tag, type)
-  },
-  logError: (client, error) => {
-    helper.log(client.user.tag, error)
+  log(message){
+    console.log(chalk.blue(`[${moment().format( 'YYYY-MM-DD hh:mm:ss' )}]`), chalk.green(message));
   },
   responseError(message, channel){
     channel.send(

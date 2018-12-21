@@ -1,59 +1,74 @@
-const Axios     = require('axios');
-const Fetch     = require('node-fetch');
-const CFGapp    = require('config').get('app');
-const CFG       = require('config').get('search');
-const jsonfile  = require('jsonfile');
-const helper    = require('../utils/helper');
+const uuid        = require('uuid/v1');
+const Axios       = require('axios');
+const Fetch       = require('node-fetch');
+const CFGapp      = require('config').get('app');
+const CFG         = require('config').get('search');
+const jsonfile    = require('jsonfile');
+const Helper      = require('../utils/helper');
+const ErrHandler  = require('../handlers/error');
+const Timer       = require('../utils/timer');
 
-module.exports = class imageSearch{
-  constructor(){
-    this.dataFile = `${CFGapp.root}/data/search.json`;
-    this.dataFileObj = null;
+const dataFile = `${CFGapp.root}/data/search.json`;
+let dataFileObj = null;
 
-    //read and set data file which will be used to keep track of API calls and other info
-    jsonfile.readFile(this.dataFile, (err, obj) => {
-      if (err)
-        helper.logError(client, err);
-      else
-        this.dataFileObj = obj;
-    });
-  }
+//read and set data file which will be used to keep track of API calls and other info
+jsonfile.readFile(dataFile, (err, obj) => {
+  if (err)
+    ErrHandler.logError(err);
+  else
+    dataFileObj = obj;
+});
+
+//TODO properly setup cfg
+const searchImgCFG = {
+  cooldown: 10000,
+  identifier: uuid(),
+};
+
+module.exports = {
+  name: 'imageSearch',
   
   isImageSearch(message){
     const input = message.content.toLowerCase();
 
     //must start with the bot name
     if(!input.startsWith(`${CFGapp.name} show me`)) return false;
+
+    //check if user used this command too often
+    if(Timer.isCoolingDown(message, searchImgCFG)) return false;
+
+    //start the timer
+    Timer.set(message, searchImgCFG);
     
     const query = input.replace(`${CFGapp.name} show me`, "");
 
-    this[this.dataFileObj.nextCall](message, query)
+    this[dataFileObj.nextCall](message, query)
     this.balanceApiCalls();
 
     return true;
-  }
+  },
 
   balanceApiCalls(){
-    const callMadeTo = this.dataFileObj.nextCall;
-    const stats = this.dataFileObj.statistics[callMadeTo];
+    const callMadeTo = dataFileObj.nextCall;
+    const stats = dataFileObj.statistics[callMadeTo];
     
     stats.callsMadeToday++;
     
     //limit reached remove service from the list for today
     if(stats.callsMadeToday >= stats.dailyQuota){
       stats.limitExceeded = true;
-      this.dataFileObj.availableServices = this.dataFileObj.availableServices.filter(item => item !== callMadeTo)
+      dataFileObj.availableServices = dataFileObj.availableServices.filter(item => item !== callMadeTo)
     }
 
     //select next service to be used
     //TODO select services with higher limit more than ones with small limits like google (100/day)
-    this.dataFileObj.nextCall = this.dataFileObj.availableServices[helper.random(0, this.dataFileObj.availableServices.length - 1)];
-    this.dataFileObj.statistics[callMadeTo] = stats;
+    dataFileObj.nextCall = dataFileObj.availableServices[Helper.random(0, dataFileObj.availableServices.length - 1)];
+    dataFileObj.statistics[callMadeTo] = stats;
     
-    jsonfile.writeFile(this.dataFile, this.dataFileObj, { spaces: 2, EOL: '\r\n' }, (err) => {
-      if(err) helper.logError(client, err);
+    jsonfile.writeFile(dataFile, dataFileObj, { spaces: 2, EOL: '\r\n' }, (err) => {
+      if(err) ErrHandler.logError(err);
     })
-  }
+  },
   
   bing(msg, query){
     Axios({
@@ -74,12 +89,12 @@ module.exports = class imageSearch{
         msg.channel.send(`Pizdec, I can't find anything about ${query}!`);
       }else{
         msg.channel.send("this image came from bing", {
-          file: images[helper.random(0, images.length - 1)].contentUrl
+          file: images[Helper.random(0, images.length - 1)].contentUrl
         })
       }
     })
-    .catch(error => console.log(error));
-  }
+    .catch(err => ErrHandler.logError(err));
+  },
 
   imgur(msg, query){
     Axios({
@@ -96,11 +111,11 @@ module.exports = class imageSearch{
       const pickImage = () => {
         
         const albumList = res.data.data;
-        const album = albumList[helper.random(0, albumList.length -1)];
+        const album = albumList[Helper.random(0, albumList.length -1)];
         let link
 
         if(album.is_album === true)
-          link = album.images[helper.random(0, album.images.length -1)];
+          link = album.images[Helper.random(0, album.images.length -1)];
         else
           link = album;
 
@@ -127,12 +142,12 @@ module.exports = class imageSearch{
           msg.channel.send("this image came from imgur", {
             file: image
           })
-          .catch(error => helper.logError(this.client, error) );
+          .catch(error => ErrHandler.logError(error) );
         }
       }
     })
-    .catch(error => helper.logError(this.client, error));
-  }
+    .catch(error => ErrHandler.logError(error));
+  },
 
   google(msg, query){
     Axios({
@@ -151,7 +166,7 @@ module.exports = class imageSearch{
       if(typeof res.data.items == 'undefined'){
         msg.channel.send(`Pizdec, I can't find anything about ${query}!`);
       }else{
-        let imageURL = res.data.items[helper.random(0, res.data.items.length - 1)].link;
+        let imageURL = res.data.items[Helper.random(0, res.data.items.length - 1)].link;
 
         Fetch(imageURL)
           .then(res => res.buffer())
@@ -159,13 +174,12 @@ module.exports = class imageSearch{
             msg.channel.send("this image came from google", {
               file: buffer
             })
-            .catch(error => helper.logError(this.client, error) );
+            .catch(error => ErrHandler.logError(error) );
           })
-          .catch(error => helper.logError(this.client, error) );
+          .catch(error => ErrHandler.logError(error) );
       }
     })
-    .catch(error => {
-      helper.logError(this.client, error)
-    })
-  }
+    .catch(error => ErrHandler.logError(error));
+  },
+  commands: {},
 }

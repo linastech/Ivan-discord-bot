@@ -1,17 +1,17 @@
+const uuid      = require('uuid/v1');
+const Timer     = require('../utils/timer');
 const CFG       = require('config').get('app');
-const helper    = require('../utils/helper');
+const Helper    = require('../utils/helper');
 
-module.exports = class interactions{
-  constructor(){
-    this.config = {
-      cooldown: 3000
-    }
+//TODO properly setup cfg
+const interactionCFG = {
+  cooldown: 4000,
+  identifier: uuid(),
+};
 
-    this.timer = new Set();
-  }
-
+module.exports = {
+  name: 'interactions',
   isInteraction(message) {
-
     //when bot name gets called in all caps
     if(message.content == CFG.name.toUpperCase())
       return this.respond(message, "WHAT KURWA?!");
@@ -26,20 +26,9 @@ module.exports = class interactions{
 
     //no matches found return false
     return false;
-  }
+  },
 
   question(message, input){
-    const timerID = `${message.guild.id}-${message.author.id}`;
-
-    //spam prevention timer
-    if(this.timer.has(timerID))
-      return false;
-
-    //create new cooldown timer
-    this.timer.add(timerID);
-
-    //delete entry after set time has passed
-    setTimeout(() => this.timer.delete(timerID), this.config.cooldown);
 
     const matches = [ "should", "is", "are", "am i", "does", "do", "did", "will", "can", "do i" ];
     const answers = [
@@ -54,15 +43,18 @@ module.exports = class interactions{
     });
       
     //if nothing is matched it would be boolean false
-    if(typeof matched === 'string'){
+    if(typeof matched === 'string' && Timer.isCoolingDown(message, interactionCFG) == false){
+      //start the timer
+      Timer.set(message, interactionCFG);
+
       //question asked is too short
       if(input.replace(`${CFG.name} ${matched}`, '').length < 3){
         this.emptyMessage(message);
         return true; 
       }
 
-      const typeOfAnswer = answers[helper.random(0, answers.length - 1)];
-      const answer = typeOfAnswer[helper.random(0, typeOfAnswer.length - 1)];
+      const typeOfAnswer = answers[Helper.random(0, answers.length - 1)];
+      const answer = typeOfAnswer[Helper.random(0, typeOfAnswer.length - 1)];
 
       this.respond(message, answer);
 
@@ -70,15 +62,17 @@ module.exports = class interactions{
     }else{
       return false;
     }
-  }
+  },
 
   emptyMessage(message){
     return this.respond(message, "You didn't ask me anything...");
-  }
+  },
   
   respond(message, response){
     message.channel.send(response);
     
     return true;
-  }
+  },
+
+  commands: {},
 }

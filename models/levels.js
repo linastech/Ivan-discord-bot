@@ -1,7 +1,7 @@
 const mongoose 	= require('mongoose');
 
 module.exports = (connection) => {
-  let Leaderboard = new mongoose.Schema({
+  let Levels = new mongoose.Schema({
     guildID:      { type: String, required: true  },
     userID:       { type: String, required: true  },
     username:     { type: String, required: true  },
@@ -10,7 +10,7 @@ module.exports = (connection) => {
     nextLevel:    { type: Number , default: 100  },
   })
 
-  Leaderboard.statics.increaseScore = function(user, guild){
+  Levels.statics.increaseScore = function(user, guild){
     const _this = this;
     
     this.findOne(
@@ -41,5 +41,5 @@ module.exports = (connection) => {
     );
   }
 
-  return connection.model('leaderboard', Leaderboard);
+  return connection.model('levels', Levels);
 }

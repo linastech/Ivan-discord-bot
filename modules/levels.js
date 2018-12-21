@@ -1,42 +1,38 @@
 const Discord   = require('discord.js');
+const uuid        = require('uuid/v1');
 
-module.exports = class levels{
-  constructor(){
-    this.cooldown = 3000;
-    this.timer = new Set();
-  }
-
-  //TODO aliases for commands
-  execute(message){
-    const user = message.author;
-
-    message.client.DB.leaderboard.findOne({userID: user.id, guildID: message.member.guild.id})
-      .then(data => {
-        if(data == null){
-          message.channel.send("Kurva you have to talk first to get ranks!");
-          return;
-        }
-
-        const embed = new Discord.RichEmbed()
-          .setTitle(user.username)
-          .setDescription(`**Level:** ${data.level} \n**Exp:** ${data.points} / ${data.nextLevel}\n**Rank:** N/A`)
-          .setColor(0x00AE86)
-          .setThumbnail(user.displayAvatarURL);
-
-        message.channel.send({embed: embed});
-      });
-  }
-
+module.exports = {
+  name: 'levels',
+  //TODO add timer
   handleExperience(message){
-    const user = message.author;
+    message.client.DB.levels.increaseScore(message.author, message.guild);
+  },
+  commands: {
+    level: {
+      config: {
+        cooldown: 10000,
+        blackListed: {},
+        identifier: uuid(),
+      },
+      aliases: ['rank'],
+      exec(message){
+        const user = message.author;
 
-    //user recently sent a message
-    if(this.timer.has(user.id)) return;
-    
-    this.timer.add(user.id);
-
-    message.client.DB.leaderboard.increaseScore(user, message.guild);
-
-    setTimeout(() => this.timer.delete(user.id), this.cooldown);
+        message.client.DB.levels.findOne({userID: user.id, guildID: message.member.guild.id})
+          .then(data => {
+            if(data == null){
+              message.channel.send("Kurva you have to talk first to get ranks!");
+            }else{
+              const embed = new Discord.RichEmbed()
+                .setTitle(user.username)
+                .setDescription(`**Level:** ${data.level} \n**Exp:** ${data.points} / ${data.nextLevel}\n**Rank:** N/A`)
+                .setColor(0x00AE86)
+                .setThumbnail(user.displayAvatarURL);
+      
+              message.channel.send({embed: embed});
+            }
+          });
+      }
+    }
   }
 }
