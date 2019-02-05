@@ -1,122 +1,93 @@
-const uuid        = require('uuid/v1');
-const helper      = require('../utils/helper');
-const ErrHandler  = require('../handlers/error');
+const uuid          = require('uuid/v1');
+const helper        = require('../utils/helper');
+const musicPlayer   = require('../utils/musicPlayer');
+const ErrHandler    = require('../handlers/error');
+const Embed         = require('../embeds/musicSearch');
 
-const audioBots = {};
-
-function isInVoiceChannel(message, channel){
-  if(typeof channel === 'undefined'){
-    helper.responseError("Please join a voice channel!", message.channel);
-    return false;
-  }else{
-    return true;
-  }
-}
-
-function createSession(channel){
-  const guildID = channel.guild.id;
-  const promise = new Promise(
-    (resolve, reject) => {
-      channel
-        .join()
-        .then(connection => {
-           audioBots[guildID] = {
-            conn:     connection,
-            channel:  connection.channel,
-            queue:    [],
-          };
-
-          resolve(true);
-        })
-        .catch(err => reject(err));
-    }
-  );
-
-  return promise;
-}
-
-module.exports = {
-  name: 'music', 
+const cmdModule = {
+  name: 'music',
   commands: {
-    leave: {
-      config: {
-        identifier: uuid(),
-        blackListed: {},
-      },
-      aliases: [],
-      exec(message){
-        try{
-          const guildID = message.guild.id;
-
-          if(typeof  audioBots[guildID] === 'undefined'){
-            throw new Error('Tried leaving voice channel but session does not exist!');
-          }else{
-            audioBots[guildID].conn.channel.leave();
-          }
-        }catch(error){
-          ErrHandler.logError(error);
-        }
-      }
-    },
-    join: {
-      config: {
-        identifier: uuid(),
-        blackListed: {},
-      },
-      aliases: [],
-      exec(message){
-        const channel = message.member.voiceChannel;
-        if( isInVoiceChannel(message, channel)){
-           createSession(channel);
-        }
-      }
-    },
-    pause: {
-      config: {
-        identifier: uuid(),
-        blackListed: {},
-      },
-      aliases: [],
-      exec(message){
-        audioBots[message.guild.id].dispatch.pause();
-      }
-    },
-    resume: {
-      config: {
-        identifier: uuid(),
-        blackListed: {},
-      },
-      aliases: [],
-      exec(message){
-         audioBots[message.guild.id].dispatch.resume();
-      }
-    },
     play: {
       config: {
         identifier: uuid(),
         blackListed: {},
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
       },
       aliases: [],
-      exec: async function(message){
-        const guildID = message.guild.id;
-        const channel = message.member.voiceChannel;
-    
-        if(! isInVoiceChannel(message, channel))
-          return;
-    
-        if(typeof  audioBots[guildID] === 'undefined'){
-          const sessionResponse = await  createSession(channel);
+      exec: async function(message, args){
+        //if video url or name given attempt to retrieve song data
+        if(args.length > 0){
+          await musicPlayer.parseQuery(args.join(' '))
+            .then(songData => {
+              //add song to queue
+              musicPlayer.queueSong(message, songData);
+            })
+            .catch(error => ErrHandler.logError(error));
         }
-    
-        if( audioBots[guildID].channel.connection == null){
-          
-          await  audioBots[guildID].channel
-            .join()
-            .then(conn =>  audioBots[guildID].conn = conn)
-        }
-    
-         audioBots[guildID].dispatch =  audioBots[guildID].conn.playFile('C:/projects/discordbot/test.mp3')
+        
+        musicPlayer.play(message);
       }
     },
+    leave: {
+      config: {
+        identifier: uuid(),
+        blackListed: {},
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
+      },
+      aliases: [],
+      exec: function(message){
+        musicPlayer.leave(message);
+      }
+    },
+    search: {
+      config: {
+        identifier: uuid(),
+        blackListed: {},
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
+      },
+      aliases: [],
+      exec: function(message, args){
+        //search for a list of videos
+        musicPlayer.youtubeAPI.search.list({
+          part: 'id',
+          q: args[0],
+          type: 'video'
+        })
+        .then(res => {
+          //gather video ids so we could fetch their info
+          const videoIds = res.data.items.map(item => item.id.videoId);
+          
+          //now get info of each found video
+          musicPlayer.youtubeAPI.videos.list({
+            part: 'contentDetails,snippet,id',
+            id: videoIds.join(','),
+          })
+          .then(videoData => {
+            Embed.sendEmbed(message, videoData.data.items);
+          });
+        });
+      }
+    },
+    skip: {
+      config: {
+        identifier: uuid(),
+        blackListed: {},
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
+      },
+      aliases: [],
+      exec: function(message){
+        musicPlayer.playNext(message);
+      }
+    }
   }
 }
+
+module.exports = cmdModule;

@@ -1,5 +1,3 @@
-const Discord = require('discord.js');
-
 //key => guild_id, value => new Set() for storing timers
 let timers = new Map();
 

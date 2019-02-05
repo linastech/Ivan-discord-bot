@@ -18,14 +18,17 @@
     "chalk": "^2.4.1",
     "config": "^3.0.0",
     "discord.js": "^11.4.2",
+    "duration-iso-8601": "^1.1.0",
     "ffmpeg-binaries": "^4.0.0",
+    "googleapis": "^36.0.0",
+    "i18n": "^0.8.3",
     "jsonfile": "^5.0.0",
     "moment": "^2.22.2",
     "mongoose": "^5.3.13",
     "node-fetch": "^2.3.0",
     "node-opus": "^0.3.1",
     "parse-error": "^0.2.0",
-    "sharp": "^0.21.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "youtube-dl": "^1.12.2"
   }
 }

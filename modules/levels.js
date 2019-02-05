@@ -12,6 +12,9 @@ module.exports = {
       config: {
         cooldown: 10000,
         blackListed: {},
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
         identifier: uuid(),
       },
       aliases: ['rank'],

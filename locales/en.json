@@ -1,0 +1,11 @@
+{
+	"moderation": {
+		"mute_duration": "Please specify mute duration!",
+		"user_not_found": "User does not exist!",
+		"input_role": "Please specify the role you wish to use!",
+		"role_created": "The new muted role has been set!",
+		"user_already_muted": "User is already muted",
+		"no_reason_given": "Please specify the reason!",
+		"message_requirements": "Please provide a number of messages from 0 to 100"
+	}
+}

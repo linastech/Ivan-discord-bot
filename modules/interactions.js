@@ -30,7 +30,7 @@ module.exports = {
 
   question(message, input){
 
-    const matches = [ "should", "is", "are", "am i", "does", "do", "did", "will", "can", "do i" ];
+    const matches = [ "should", "is", "are", "am i", "does", "do", "did", "will", "can" ];
     const answers = [
       //positive
       ["yes", "sure", "ya", "yeah", "i think so"],

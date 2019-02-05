@@ -20,5 +20,8 @@ module.exports = {
   },
   random(from, to){
     return Math.round((Math.random() * to) + from);
-  }
+  },
+  percent(input, percentage){
+    return Math.round((input / 100) * percentage);
+  },
 }

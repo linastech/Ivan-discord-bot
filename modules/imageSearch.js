@@ -88,7 +88,7 @@ module.exports = {
       if(images.length == 0){
         msg.channel.send(`Pizdec, I can't find anything about ${query}!`);
       }else{
-        msg.channel.send("this image came from bing", {
+        msg.channel.send({
           file: images[Helper.random(0, images.length - 1)].contentUrl
         })
       }
@@ -139,7 +139,7 @@ module.exports = {
         if(image === null){
           msg.channel.send(`Pizdec, I can't find anything about${query}!`);
         }else{
-          msg.channel.send("this image came from imgur", {
+          msg.channel.send({
             file: image
           })
           .catch(error => ErrHandler.logError(error) );
@@ -171,7 +171,7 @@ module.exports = {
         Fetch(imageURL)
           .then(res => res.buffer())
           .then(buffer => {
-            msg.channel.send("this image came from google", {
+            msg.channel.send({
               file: buffer
             })
             .catch(error => ErrHandler.logError(error) );

@@ -4,7 +4,7 @@ const Error       = require('../handlers/error');
 const Helper      = require('../utils/helper');
 
 mongoose.connect(
-    `mongodb://${CFG.host}:${CFG.port}/${CFG.database}`,
+    `mongodb://${CFG.username}:${CFG.password}@${CFG.host}:${CFG.port}/${CFG.database}?authSource=${CFG.authSource}`,
     { useNewUrlParser: true }
   ).then(
     () => Helper.log('Connected to the database!'),
@@ -15,6 +15,8 @@ mongoose.connect(
 
 
 module.exports = {
-  levels:       require('../models/levels')(mongoose.connection),
-  settings:     require('../models/guild')(mongoose.connection),
+  messages:           require('../models/messages')(mongoose.connection),
+  guilds:             require('../models/guilds')(mongoose.connection),
+  levels:             require('../models/levels')(mongoose.connection),
+  ['guild-cmd-cfg']:  require('../models/guild-cmd-cfg')(mongoose.connection),
 }

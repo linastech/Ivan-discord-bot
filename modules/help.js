@@ -1,4 +1,5 @@
-const CFG = require('config').get('app');
+const uuid    = require('uuid/v1');
+const CFG     = require('config').get('app');
 
 module.exports = {
   name: 'help', 
@@ -6,10 +7,16 @@ module.exports = {
   commands: {
     help: {
       config: {
+        cooldown: 10000,
         blackListed: {},
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
+        identifier: uuid(),
       },
       aliases: ['commands'],
       exec(message){
+        console.log(' test')
         message.channel.send({
           embed: {
             description: `

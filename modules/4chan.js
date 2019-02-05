@@ -10,14 +10,16 @@ module.exports = {
     ['4chan']: {
       config: {
         identifier: uuid(),
-        cooldown: 10000,
+        cooldown: 5000,
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
         blackListed: {
           "475116815945564160": ['515880600524161034', '520653641623797760']
         },
       },
       aliases: [],
       exec(message, board){
-
         Axios({
           url: `https://a.4cdn.org/${board}/${Helper.random(1, 9)}.json`,
           method: 'get',
@@ -46,6 +48,9 @@ module.exports = {
       config: {
         cooldown: 30000,
         blackListed: {},
+        permissions: [],
+        botPermissions: [],
+        guildCmdCfg: {},
         identifier: uuid(),
       },
       aliases: [],

@@ -1,21 +1,21 @@
-const Discord           = require('discord.js');
-const CFG               = require('config').get('app');
-const eventHandlers     = require('./handlers/event');
-const dbHandler         = require('./handlers/database');
-const modulesHandler    = require('./handlers/module'); 
-const errorHandler      = require('./handlers/error'); 
+const CFG       = require('config').get('app');
+const Client    = require('./handlers/module'); //loads modules and returns Discord.js client
+const i18n      = require('i18n');
+const path      = require('path');
+
+i18n.configure({
+  objectNotation: true,
+  locales:['en'],
+  directory: path.dirname(require.main.filename)+'/locales',
+});
 
 process.env["NODE_CONFIG_DIR"] = __dirname + "/config/";
 
-const client          = new Discord.Client();
-client.DB             = dbHandler;
-client.isCommand      = modulesHandler.isCommand;
-client.commands       = modulesHandler.commands;
-client.modules        = modulesHandler.modules;
-client.eventHandlers  = eventHandlers;
-client.errorHandler   = errorHandler;
+Client.DB             = require('./handlers/database');
+Client.eventHandlers  = require('./handlers/event');
+Client.errHandler     = require('./handlers/error');
 
-client.login(CFG.token);
+Client.login(CFG.token);
 
-client.on('message', message => client.eventHandlers.get('message')(message));
-client.on('guildCreate', guild => client.eventHandlers.get('guildCreate')(guild));
+Client.on('message', message => Client.eventHandlers.get('message')(message));
+Client.on('guildCreate', guild => Client.eventHandlers.get('guildCreate')(guild));

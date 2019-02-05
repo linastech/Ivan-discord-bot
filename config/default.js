@@ -23,11 +23,19 @@ module.exports = {
     imgur: {
       ID:       "",
       secret:   "",
-    }
+    },
+  },
+  movies: {
+    themoviedb: {
+      api_key: '',
+    },
   },
   database:         {
     host:     "127.0.0.1", 
     port:     "27017",
+    username: "rnd",
+    password: "",
     database: "ivan",
+    authSource: "admin"
   }
 }
