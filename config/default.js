@@ -7,8 +7,8 @@ module.exports = {
     alias:      "ivan",
     name:       "ivan",
     infoColor:  560805,
-    webURL:     "https://theivan.wtf",
-    webName:    "theivan.wtf",
+    webURL:     "https://ivan.shirase.cloud",
+    webName:    "ivan.shirase.cloud",
     root:       path.dirname(require.main.filename),
   },
   search: {

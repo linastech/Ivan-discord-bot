@@ -4,7 +4,7 @@ Ivan is a funny multifunctional discord bot capable of interacting with group me
 
 # Official Bot Website
 
-http://theivan.wtf
+https://ivan.shirase.cloud/
 
 # Discord Server
 
